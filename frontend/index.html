@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Data Analysis Dashboard - Professional Analytics Platform">
+    <title>Data Analysis Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Plotly.js for Phase 3 Visualizations -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <span class="logo-icon">📊</span>
+                <span class="logo-text">DataLytics</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-page="overview">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Overview</span>
+            </a>
+            <a href="#" class="nav-item" data-page="statistics">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Statistics</span>
+            </a>
+            <a href="#" class="nav-item" data-page="visualizations">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Visualizations</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <div class="user-details">
+                    <div class="user-name">Analyst</div>
+                    <div class="user-role">Data Scientist</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <h1 class="greeting">Good afternoon</h1>
+                <p class="dataset-name" id="datasetName">No dataset loaded</p>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" id="refreshBtn" title="Refresh">
+                    <span>🔄</span>
+                </button>
+                <button class="header-btn" id="uploadNewBtn" title="Upload New Dataset">
+                    <span>📁</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Upload Page (Initial State) -->
+            <div class="page-content active" id="uploadPage">
+                <div class="upload-container">
+                    <div class="upload-card">
+                        <h2 class="upload-title">Upload Your Dataset</h2>
+                        <p class="upload-description">
+                            Upload a CSV or Excel file to begin analysis. Supported formats: .csv, .xlsx, .xls
+                        </p>
+
+                        <!-- File Upload Area -->
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">📁</div>
+                            <p class="upload-text">Drag & drop your file here</p>
+                            <p class="upload-subtext">or</p>
+                            <label for="fileInput" class="btn btn-primary">
+                                Choose File
+                            </label>
+                            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden>
+                        </div>
+
+                        <!-- Selected File Info -->
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <div class="file-details">
+                                <span class="file-icon">📄</span>
+                                <div class="file-text">
+                                    <p class="file-name" id="fileName"></p>
+                                    <p class="file-size" id="fileSize"></p>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" id="uploadBtn">
+                                Upload & Analyze
+                            </button>
+                        </div>
+
+                        <!-- Loading Indicator -->
+                        <div class="loading" id="loading" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Analyzing your dataset...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div class="page-content" id="dashboardPage">
+
+                <!-- KPI Cards -->
+                <div class="kpi-section">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Total Rows</span>
+                            <span class="kpi-trend positive">↑ 100%</span>
+                        </div>
+                        <div class="kpi-value" id="kpiRows">0</div>
+                        <div class="kpi-chart">
+                            <div class="mini-chart" id="miniChart1"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Total Columns</span>
+                            <span class="kpi-trend positive">↑ 100%</span>
+                        </div>
+                        <div class="kpi-value" id="kpiColumns">0</div>
+                        <div class="kpi-chart">
+                            <div class="mini-chart" id="miniChart2"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Numeric Columns</span>
+                            <span class="kpi-trend neutral">—</span>
+                        </div>
+                        <div class="kpi-value" id="kpiNumeric">0</div>
+                        <div class="kpi-chart">
+                            <div class="mini-chart" id="miniChart3"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Missing Data</span>
+                            <span class="kpi-trend negative">↓ 0%</span>
+                        </div>
+                        <div class="kpi-value" id="kpiMissing">0%</div>
+                        <div class="kpi-chart">
+                            <div class="mini-chart" id="miniChart4"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="dashboard-grid">
+                    <!-- Left Column - Main Charts -->
+                    <div class="grid-left">
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Data Type Distribution</h3>
+                            </div>
+                            <div class="chart-container" id="typeDistChart"></div>
+                        </div>
+
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Column Statistics Overview</h3>
+                            </div>
+                            <div class="chart-container" id="statsOverviewChart"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Summary & Tables -->
+                    <div class="grid-right">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Missing Values</h3>
+                            </div>
+                            <div class="chart-container small" id="missingChart"></div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Top Columns by Unique Values</h3>
+                            </div>
+                            <div class="table-container">
+                                <table class="summary-table" id="topColumnsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Column</th>
+                                            <th>Unique</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overview Page -->
+            <div class="page-content" id="overviewPage">
+                <div class="content-section">
+                    <h2 class="section-title">📋 Dataset Overview</h2>
+                    <div class="stats-grid" id="basicInfo">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <h2 class="section-title">📊 Column Information</h2>
+                    <div class="table-container">
+                        <table class="data-table" id="columnTable">
+                            <thead>
+                                <tr>
+                                    <th>Column Name</th>
+                                    <th>Data Type</th>
+                                    <th>Semantic Type</th>
+                                    <th>Non-Null Count</th>
+                                    <th>Null Count</th>
+                                    <th>Null %</th>
+                                    <th>Unique Values</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <h2 class="section-title">👁️ Data Preview (First 10 Rows)</h2>
+                    <div class="table-container">
+                        <table class="data-table" id="previewTable">
+                            <!-- Populated by JavaScript -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Page -->
+            <div class="page-content" id="statisticsPage">
+                <div class="content-section">
+                    <h2 class="section-title">📈 Descriptive Statistics</h2>
+
+                    <h3 class="subsection-title">Dataset Summary</h3>
+                    <div class="stats-grid" id="datasetSummary">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <h3 class="subsection-title">Column Statistics</h3>
+                    <div class="table-container">
+                        <table class="data-table" id="statisticsTable">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Count</th>
+                                    <th>Mean</th>
+                                    <th>Median</th>
+                                    <th>Mode</th>
+                                    <th>Min</th>
+                                    <th>Max</th>
+                                    <th>Std Dev</th>
+                                    <th>Variance</th>
+                                    <th>Q1</th>
+                                    <th>Q2</th>
+                                    <th>Q3</th>
+                                    <th>Range</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="noNumericMessage" style="display: none;">
+                        <p class="info-message">ℹ️ No numerical columns found in this dataset.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualizations Page -->
+            <div class="page-content" id="visualizationsPage">
+                <div class="content-section">
+                    <h2 class="section-title">📊 Data Visualizations</h2>
+
+                    <!-- Loading Skeleton -->
+                    <div id="chartsLoading" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Generating visualizations...</p>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid" id="chartsGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <!-- No Charts Message -->
+                    <div id="noChartsMessage" style="display: none;">
+                        <p class="info-message">ℹ️ No visualizations available for this dataset.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <span class="error-icon">⚠️</span>
+                <p id="errorText"></p>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
