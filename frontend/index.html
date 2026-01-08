@@ -40,8 +40,12 @@
                 <span class="nav-text">Statistics</span>
             </a>
             <a href="#" class="nav-item" data-page="visualizations">
-                <span class="nav-icon">📊</span>
-                <span class="nav-text">Visualizations</span>
+                <i class="fas fa-chart-pie"></i>
+                <span>Visualizations</span>
+            </a>
+            <a href="#" class="nav-item" data-page="insights">
+                <i class="fas fa-lightbulb"></i>
+                <span>Insights</span>
             </a>
         </nav>
 
@@ -322,6 +326,25 @@
                     <!-- No Charts Message -->
                     <div id="noChartsMessage" style="display: none;">
                         <p class="info-message">ℹ️ No visualizations available for this dataset.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights Page -->
+            <div class="page-content" id="insightsPage">
+                <div class="content-section">
+                    <h2 class="section-title">💡 Automated Insights</h2>
+
+                    <div class="insight-summary" id="insightSummary">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <div class="insights-grid" id="insightsGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <div id="noInsightsMessage" style="display: none;">
+                        <p class="info-message">ℹ️ No automated insights found for this dataset.</p>
                     </div>
                 </div>
             </div>

@@ -196,6 +196,9 @@ async function processDataset(filename) {
         populateStatistics(statsData);
         populateVisualizations(vizData);
 
+        // Fetch and display insights
+        await fetchAndDisplayInsights(filename);
+
         // Switch to dashboard
         switchPage('dashboard');
 
@@ -373,51 +376,77 @@ function populateVisualizations(viz) {
     }
 }
 
-function renderChart(chart) {
-    const containerId = `chart-${chart.id}`;
-    const container = document.getElementById(containerId);
+// ==================== Insights Population ====================
 
-    if (!container || !window.Plotly) return;
+async function fetchAndDisplayInsights(filename) {
+    const insightsGrid = document.getElementById('insightsGrid');
+    const noInsightsMessage = document.getElementById('noInsightsMessage');
+    const insightSummary = document.getElementById('insightSummary');
 
     try {
-        const plotlyConfig = chart.plotly_config;
+        const response = await fetch(`${API_BASE_URL}/insights/${filename}`);
+        if (!response.ok) throw new Error('Failed to fetch insights');
+        const data = await response.json();
 
-        // Customize layout for light theme
-        if (plotlyConfig.layout) {
-            plotlyConfig.layout = {
-                ...plotlyConfig.layout,
-                paper_bgcolor: 'rgba(255,255,255,0)',
-                plot_bgcolor: 'rgba(248,250,252,1)',
-                font: { color: '#0f172a' },
-                xaxis: {
-                    ...plotlyConfig.layout.xaxis,
-                    gridcolor: 'rgba(226,232,240,1)',
-                    color: '#0f172a'
-                },
-                yaxis: {
-                    ...plotlyConfig.layout.yaxis,
-                    gridcolor: 'rgba(226,232,240,1)',
-                    color: '#0f172a'
-                },
-                margin: { t: 30, r: 20, b: 50, l: 50 },
-                autosize: true
-            };
+        if (!data.insights || data.insights.length === 0) {
+            if (noInsightsMessage) noInsightsMessage.style.display = 'block';
+            if (insightsGrid) insightsGrid.innerHTML = '';
+            if (insightSummary) insightSummary.innerHTML = '';
+            return;
         }
 
-        Plotly.newPlot(
-            containerId,
-            plotlyConfig.data,
-            plotlyConfig.layout,
-            {
-                responsive: true,
-                displayModeBar: true,
-                modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
-                displaylogo: false
-            }
-        );
+        if (noInsightsMessage) noInsightsMessage.style.display = 'none';
+
+        // Render Summary Cards
+        if (insightSummary) {
+            insightSummary.innerHTML = `
+                <div class="stat-card" style="border-left: 4px solid #ef4444;">
+                    <div class="stat-label">High Severity</div>
+                    <div class="stat-value" style="color: #ef4444;">${data.summary.high}</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+                    <div class="stat-label">Medium Severity</div>
+                    <div class="stat-value" style="color: #f59e0b;">${data.summary.medium}</div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid #3b82f6;">
+                    <div class="stat-label">Low Severity</div>
+                    <div class="stat-value" style="color: #3b82f6;">${data.summary.low}</div>
+                </div>
+            `;
+        }
+
+        // Render Insight Cards
+        if (insightsGrid) {
+            insightsGrid.innerHTML = data.insights.map((insight, index) => `
+                <div class="insight-card severity-${insight.severity}" style="animation-delay: ${index * 0.1}s" onclick="this.classList.toggle('expanded')">
+                    <div class="insight-header">
+                        <span class="insight-title">${insight.title}</span>
+                        <span class="severity-badge">${insight.severity}</span>
+                    </div>
+                    <p class="insight-description">${insight.description}</p>
+                    <div class="insight-footer">
+                        <span class="insight-type">
+                            <i class="fas fa-tag"></i> ${insight.type.replace('_', ' ')}
+                        </span>
+                        <span>Click to see evidence</span>
+                    </div>
+                    <div class="insight-evidence">
+                        <strong>Evidence:</strong><br>
+                        Metric: ${insight.evidence.metric}<br>
+                        Value: ${insight.evidence.value}<br>
+                        Threshold: ${insight.evidence.threshold}<br>
+                        Target Columns: ${insight.columns.join(', ')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
     } catch (error) {
-        console.error(`Error rendering chart ${chart.id}:`, error);
-        container.innerHTML = '<p class="info-message">⚠️ Error rendering chart</p>';
+        console.error('Error fetching insights:', error);
+        if (noInsightsMessage) {
+            noInsightsMessage.textContent = '⚠️ Error loading insights';
+            noInsightsMessage.style.display = 'block';
+        }
     }
 }
 

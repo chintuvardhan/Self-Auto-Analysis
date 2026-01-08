@@ -759,6 +759,130 @@ body {
     }
 }
 
+/* Insights Section */
+.insight-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.insight-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #cbd5e1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.5s ease forwards;
+}
+
+.insight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.insight-card.severity-high {
+    border-left-color: #ef4444;
+}
+
+.insight-card.severity-medium {
+    border-left-color: #f59e0b;
+}
+
+.insight-card.severity-low {
+    border-left-color: #3b82f6;
+}
+
+.insight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.insight-title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: #1e293b;
+}
+
+.severity-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.severity-high .severity-badge {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.severity-medium .severity-badge {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.severity-low .severity-badge {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.insight-description {
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.insight-evidence {
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #334155;
+    display: none;
+    margin-top: 1rem;
+    border: 1px dashed #e2e3e5;
+}
+
+.insight-card.expanded .insight-evidence {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.insight-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+    color: #94a3b8;
+}
+
+.insight-type {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ==================== Responsive Design ==================== */
 @media (max-width: 1200px) {
     .dashboard-grid {

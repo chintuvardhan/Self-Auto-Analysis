@@ -21,6 +21,7 @@ import os
 from app.services.profiler import DatasetProfiler
 from app.services.statistics import StatisticsEngine
 from app.services.visualizer import VisualizationEngine
+from app.services.insights import InsightEngine
 from app.utils.validators import validate_file_extension
 
 # Create API router
@@ -281,6 +282,49 @@ async def get_statistics(filename: str):
         raise HTTPException(
             status_code=500,
             detail=f"Error computing statistics: {str(e)}"
+        )
+
+
+@router.get("/insights/{filename}")
+async def get_insights(filename: str):
+    """
+    Get rule-based insights for the dataset.
+    """
+    file_path = UPLOADS_DIR / filename
+    
+    if not file_path.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"detail": "File not found"}
+        )
+    
+    try:
+        # Load dataset
+        profiler = DatasetProfiler(str(file_path))
+        profile_data = profiler.get_profile()
+        
+        # Get statistics for insights
+        stats_engine = StatisticsEngine(profiler.df, profile_data)
+        stats_data = stats_engine.get_statistics()
+        
+        # Generate insights
+        insight_engine = InsightEngine(profiler.df, profile_data, stats_data)
+        insights = insight_engine.generate_insights()
+        summary = insight_engine.get_summary()
+        
+        return JSONResponse(
+            status_code=200,
+            content={
+                "filename": filename,
+                "summary": summary,
+                "insights": insights
+            }
+        )
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Error generating insights: {str(e)}"}
         )
 
 
